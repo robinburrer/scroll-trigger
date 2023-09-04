@@ -1,4 +1,4 @@
-# Apple like img seqence animation
+# Apple like img sequence animation
 
 This is a basic scroll image sequence animation triggered by scrolling.
 Inspired by: https://css-tricks.com/lets-make-one-of-those-fancy-scrolling-animations-used-on-apple-product-pages/.
