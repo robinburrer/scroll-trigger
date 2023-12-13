@@ -25,28 +25,33 @@ const canvas = document.querySelector('.canvas');
 const canvasContainer = document.querySelector('.canvas-container');
 const context = canvas.getContext('2d');
 
-const frameCount = 120;
+const frameCount = 107;
 const currentFrame = (index) =>
-  `./assets/out${index.toString().padStart(1, '0')}.png`;
+  `./assets/image-${index.toString().padStart(3, '0')}.jpg`;
 
 const preloadImages = () => {
   for (let i = 1; i < frameCount; i++) {
     const img = new Image();
     img.src = currentFrame(i);
+    images.push(img);
   }
 };
 
 const img = new Image();
+const images = [];
 img.src = currentFrame(1);
-canvas.width = 1024;
-canvas.height = 576;
+canvas.width = 1920;
+canvas.height = 1080;
 img.onload = function () {
   context.drawImage(img, 0, 0);
+  images.push(img);
 };
 
 const updateImage = (index) => {
-  img.src = currentFrame(index);
-  context.drawImage(img, 0, 0);
+ //img.src = currentFrame(index);
+ const myImage = images[index]
+  
+  context.drawImage(myImage, 0, 0);
 };
 
 window.addEventListener('scroll', () => {
