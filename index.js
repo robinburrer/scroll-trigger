@@ -25,9 +25,9 @@ const canvas = document.querySelector('.canvas');
 const canvasContainer = document.querySelector('.canvas-container');
 const context = canvas.getContext('2d');
 
-const frameCount = 107;
+const frameCount = 116;
 const currentFrame = (index) =>
-  `./assets/image-${index.toString().padStart(3, '0')}.jpg`;
+  `./assets/out${index.toString()}.png`;
 
 const preloadImages = () => {
   for (let i = 1; i < frameCount; i++) {
@@ -50,8 +50,10 @@ img.onload = function () {
 const updateImage = (index) => {
  //img.src = currentFrame(index);
  const myImage = images[index]
-  
-  context.drawImage(myImage, 0, 0);
+  if (myImage) {
+    context.drawImage(myImage, 0, 0);
+
+  }
 };
 
 window.addEventListener('scroll', () => {
@@ -79,6 +81,7 @@ window.addEventListener('scroll', () => {
         Math.ceil(scrollFraction * frameCount)
       );
       requestAnimationFrame(() => updateImage(frameIndex + 1));
+      console.log(`frameIndex ${frameIndex}`)
 
       break;
 
