@@ -25,9 +25,12 @@ const canvas = document.querySelector('.canvas');
 const canvasContainer = document.querySelector('.canvas-container');
 const context = canvas.getContext('2d');
 
-const frameCount = 120;
+const frameCount = 81  ;
+// frame-000011
 const currentFrame = (index) =>
-  `./assets/out${index.toString().padStart(1, '0')}.png`;
+  `./assets-05/${index.toString().padStart(3, '0')}.png`;
+
+//woman00108000
 
 const preloadImages = () => {
   for (let i = 1; i < frameCount; i++) {
@@ -38,8 +41,8 @@ const preloadImages = () => {
 
 const img = new Image();
 img.src = currentFrame(1);
-canvas.width = 1024;
-canvas.height = 576;
+canvas.width = 1080;
+canvas.height = 1920;
 img.onload = function () {
   context.drawImage(img, 0, 0);
 };
