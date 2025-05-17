@@ -5,15 +5,20 @@ SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 
 # Input/output directories
 INPUT_DIR="/Users/robinburrer/Desktop/frames-input"
-OUTPUT_PNG_DIR="/Users/robinburrer/Desktop/frames-output"
-OUTPUT_FLATTENED_DIR="/Users/robinburrer/Desktop/frames-output-flattened"
-OUTPUT_WEBP_DIR="/Users/robinburrer/Desktop/webp-output"
+OUTPUT_PNG_DIR="$INPUT_DIR/frames-output"
+OUTPUT_FLATTENED_DIR="$INPUT_DIR/frames-output-flattened"
+OUTPUT_WEBP_DIR="$INPUT_DIR/webp-output"
 SCRIPT="$SCRIPT_DIR/remove-bg.scpt"
 
 # Create output directories
 mkdir -p "$OUTPUT_PNG_DIR"
 mkdir -p "$OUTPUT_FLATTENED_DIR"
 mkdir -p "$OUTPUT_WEBP_DIR"
+
+# Clear all contents inside output directories
+rm -rf "$OUTPUT_PNG_DIR"/*
+rm -rf "$OUTPUT_FLATTENED_DIR"/*
+rm -rf "$OUTPUT_WEBP_DIR"/*
 
 # Enable nullglob so *.png doesn't return literal string if no match
 shopt -s nullglob
