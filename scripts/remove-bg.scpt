@@ -10,15 +10,15 @@ on run argv
         delay 1
 
         if (count of documents) = 0 then
-            display dialog "Failed to open image: " & inputPath
-            return
+            return -- document failed to open, skip
         end if
 
         tell the front document
             remove background
             delay 1
             export to outputFile as PNG
-            close saving no
+            delay 1
+            close saving no -- this closes the document
         end tell
     end tell
 end run

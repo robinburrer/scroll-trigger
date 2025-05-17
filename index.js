@@ -2,7 +2,7 @@
 const SCROLLING_ABOVE = 0;
 const SCROLLING_WITHIN = 1;
 const SCROLLING_BELOW = 2;
-const frameCount = 81;
+const frameCount = 72;
 
 // DOM Elements
 const canvas = document.querySelector('.canvas');
