@@ -5,4 +5,10 @@ Inspired by: https://css-tricks.com/lets-make-one-of-those-fancy-scrolling-anima
 
 This example however, takes the animation one step further, so it can be integrated nicely in your existing HTML content.
 
+## script for converting to .webp
+for f in *.png; do
+  cwebp -q 01 "$f" -o "webp-output/${f%.png}.webp"
+done
+
+
 https://scrumultra.com/scroll-trigger/
