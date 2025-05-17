@@ -1,0 +1,8 @@
+osascript -e 'tell application "Pixelmator Pro"
+    open "/Users/robinburrer/Desktop/frame-000000.jpg"
+    tell the front document
+        remove background
+        export to "/Users/robinburrer/Desktop/image.png" as PNG
+        close saving no
+    end tell
+end tell'
