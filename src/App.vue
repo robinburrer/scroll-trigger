@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import HelloWorld from './components/HelloWorld.vue'
+
 import ScrollTrigger from './ScrollTrigger.vue';
 </script>
 
 <template>
 
-  <ScrollTrigger />
+  <ScrollTrigger :image-path="'/assets'" />
 </template>
 
 <style scoped>

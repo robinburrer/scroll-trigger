@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, onBeforeUnmount, ref } from 'vue';
+import { onMounted, onBeforeUnmount, ref, watch } from 'vue';
 
 const SCROLLING_ABOVE = 0;
 const SCROLLING_WITHIN = 1;
@@ -12,18 +12,21 @@ const images: (HTMLImageElement | undefined)[] = new Array(frameCount);
 let currentFrameIndex = -1;
 let ticking = false;
 
-const currentFrame = (index: number): string => {
+interface ScrollTriggerProps {
+  imagePath: string;
+  scrollLength?: number; // in pixels or default to 300vh
+}
 
-  return new URL(`/assets/${index.toString().padStart(3, '0')}.webp`, import.meta.url).href;
+const props = defineProps<ScrollTriggerProps>();
+
+const currentFrame = (index: number): string => {
+  return new URL(`${props.imagePath}/${index.toString().padStart(3, '0')}.webp`, import.meta.url).href;
 };
 
 const preloadInitialImages = () => {
   for (let i = 1; i <= frameCount; i++) {
-
     const img = new Image();
-    const cf = currentFrame(i);
-    console.log(cf)
-    img.src = cf
+    img.src = currentFrame(i);
     images[i] = img;
   }
 };
@@ -34,9 +37,32 @@ const drawFrame = (index: number) => {
   const context = canvas.value.getContext('2d');
   if (!context) return;
 
+  const image = images[index] as HTMLImageElement;
+  const canvasWidth = canvas.value.width;
+  const canvasHeight = canvas.value.height;
+
+  // Clear canvas
+  context.clearRect(0, 0, canvasWidth, canvasHeight);
+
+  // Scale image to fit ("contain")
+  const imageRatio = image.width / image.height;
+  const canvasRatio = canvasWidth / canvasHeight;
+
+  let drawWidth: number, drawHeight: number;
+
+  if (imageRatio > canvasRatio) {
+    drawWidth = canvasWidth;
+    drawHeight = canvasWidth / imageRatio;
+  } else {
+    drawHeight = canvasHeight;
+    drawWidth = canvasHeight * imageRatio;
+  }
+
+  const offsetX = (canvasWidth - drawWidth) / 2;
+  const offsetY = (canvasHeight - drawHeight) / 2;
+
   currentFrameIndex = index;
-  context.clearRect(0, 0, canvas.value.width, canvas.value.height);
-  context.drawImage(images[index] as HTMLImageElement, 0, 0);
+  context.drawImage(image, offsetX, offsetY, drawWidth, drawHeight);
 };
 
 const isElementInViewport = (el: HTMLElement): number => {
@@ -57,6 +83,8 @@ const handleScroll = () => {
   const containerRect = canvasContainer.value.getBoundingClientRect();
   const containerTop = containerRect.top + window.scrollY;
 
+  const scrollLen = props.scrollLength ?? window.innerHeight * 3;
+
   switch (state) {
     case SCROLLING_ABOVE:
       canvas.value.classList.remove('canvas--active');
@@ -68,8 +96,7 @@ const handleScroll = () => {
       canvasContainer.value.classList.remove('canvas-container--end');
 
       const scrollTop = window.scrollY - containerTop;
-      const maxScroll = canvasContainer.value.clientHeight - window.innerHeight;
-      const scrollFraction = Math.min(Math.max(scrollTop / maxScroll, 0), 1);
+      const scrollFraction = Math.min(Math.max(scrollTop / scrollLen, 0), 1);
       const frameIndex = Math.min(
         frameCount - 1,
         Math.ceil(scrollFraction * (frameCount - 1))
@@ -94,16 +121,17 @@ const onScroll = () => {
   }
 };
 
-onMounted(() => {
+const setCanvasSize = () => {
   if (canvas.value) {
-    canvas.value.width = 1080;
-    canvas.value.height = 1920;
-    canvas.value.style.willChange = 'transform';
+    canvas.value.width = window.innerWidth;
+    canvas.value.height = window.innerHeight;
   }
+};
 
+onMounted(() => {
+  setCanvasSize();
   preloadInitialImages();
 
-  // Ensure first image is drawn after it's loaded
   const firstImage = new Image();
   firstImage.src = currentFrame(1);
   firstImage.onload = () => {
@@ -112,12 +140,21 @@ onMounted(() => {
   };
 
   window.addEventListener('scroll', onScroll, { passive: true });
+  window.addEventListener('resize', setCanvasSize);
+
+  // Ensure enough scroll space
+  if (canvasContainer.value) {
+    const scrollLen = props.scrollLength ?? window.innerHeight * 3;
+    canvasContainer.value.style.height = `${scrollLen + window.innerHeight}px`;
+  }
 });
 
 onBeforeUnmount(() => {
   window.removeEventListener('scroll', onScroll);
+  window.removeEventListener('resize', setCanvasSize);
 });
 </script>
+
 
 <template>
     <h2>hello</h2>
@@ -129,8 +166,14 @@ onBeforeUnmount(() => {
 <style scoped>
 .canvas {
     width: 100%;
+    height: 100vh;
     display: block;
+    position: sticky;
+    top: 0;
 }
+
+.canvas-container {}
+
 
 .canvas--active {
     /* Optional active state styling */
