@@ -125,6 +125,9 @@ const setCanvasSize = () => {
   if (canvas.value) {
     canvas.value.width = window.innerWidth;
     canvas.value.height = window.innerHeight;
+      const i = currentFrameIndex
+      currentFrameIndex = -1;
+      drawFrame(i)
   }
 };
 
@@ -157,29 +160,29 @@ onBeforeUnmount(() => {
 
 
 <template>
-    <h2>hello</h2>
-    <div ref="canvasContainer" class="canvas-container">
-        <canvas ref="canvas" class="canvas"></canvas>
-    </div>
+  <h2>hello</h2>
+  <div ref="canvasContainer" class="canvas-container">
+    <canvas ref="canvas" class="canvas"></canvas>
+  </div>
 </template>
 
 <style scoped>
 .canvas {
-    width: 100%;
-    height: 100vh;
-    display: block;
-    position: sticky;
-    top: 0;
+  width: 100%;
+  height: 100vh;
+  display: block;
+  position: sticky;
+  top: 0;
 }
 
 .canvas-container {}
 
 
 .canvas--active {
-    /* Optional active state styling */
+  /* Optional active state styling */
 }
 
 .canvas-container--end {
-    /* Optional end state styling */
+  /* Optional end state styling */
 }
 </style>
