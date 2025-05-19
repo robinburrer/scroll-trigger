@@ -1,14 +1,5 @@
-# Apple like img sequence animation
+# Vue 3 + TypeScript + Vite
 
-This is a basic scroll image sequence animation triggered by scrolling.
-Inspired by: https://css-tricks.com/lets-make-one-of-those-fancy-scrolling-animations-used-on-apple-product-pages/.
+This template should help get you started developing with Vue 3 and TypeScript in Vite. The template uses Vue 3 `<script setup>` SFCs, check out the [script setup docs](https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup) to learn more.
 
-This example however, takes the animation one step further, so it can be integrated nicely in your existing HTML content.
-
-## script for converting to .webp
-for f in *.png; do
-  cwebp -q 01 "$f" -o "webp-output/${f%.png}.webp"
-done
-
-
-https://scrumultra.com/scroll-trigger/
+Learn more about the recommended Project Setup and IDE Support in the [Vue Docs TypeScript Guide](https://vuejs.org/guide/typescript/overview.html#project-setup).
