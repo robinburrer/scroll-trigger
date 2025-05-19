@@ -6,6 +6,10 @@ const SCROLLING_WITHIN = 1;
 const SCROLLING_BELOW = 2;
 const frameCount = 72;
 
+const BASE_WIDTH = 1080;
+const BASE_HEIGHT = 1920;
+const ASPECT_RATIO = BASE_WIDTH / BASE_HEIGHT;
+
 const canvas = ref<HTMLCanvasElement | null>(null);
 const canvasContainer = ref<HTMLDivElement | null>(null);
 const images: (HTMLImageElement | undefined)[] = new Array(frameCount);
@@ -32,38 +36,30 @@ const preloadInitialImages = () => {
 };
 
 const drawFrame = (index: number) => {
-  if (index === currentFrameIndex || !images[index] || !canvas.value) return;
+  if (!canvas.value || !images[index]) return;
+  const ctx = canvas.value.getContext('2d');
+  if (!ctx) return;
 
-  const context = canvas.value.getContext('2d');
-  if (!context) return;
+  const dpr = window.devicePixelRatio || 1;
+  const image = images[index]!;
 
-  const image = images[index] as HTMLImageElement;
-  const canvasWidth = canvas.value.width;
-  const canvasHeight = canvas.value.height;
+  ctx.setTransform(1, 0, 0, 1, 0, 0); // Reset transform
+  ctx.clearRect(0, 0, canvas.value.width, canvas.value.height);
+  ctx.scale(dpr, dpr);
 
-  // Clear canvas
-  context.clearRect(0, 0, canvasWidth, canvasHeight);
+  const canvasWidth = BASE_WIDTH;
+  const canvasHeight = BASE_HEIGHT;
 
-  // Scale image to fit ("contain")
-  const imageRatio = image.width / image.height;
-  const canvasRatio = canvasWidth / canvasHeight;
+  const scale = Math.min(canvasWidth / image.width, canvasHeight / image.height);
+  const scaledWidth = image.width * scale;
+  const scaledHeight = image.height * scale;
+  const offsetX = (canvasWidth - scaledWidth) / 2;
+  const offsetY = (canvasHeight - scaledHeight) / 2;
 
-  let drawWidth: number, drawHeight: number;
-
-  if (imageRatio > canvasRatio) {
-    drawWidth = canvasWidth;
-    drawHeight = canvasWidth / imageRatio;
-  } else {
-    drawHeight = canvasHeight;
-    drawWidth = canvasHeight * imageRatio;
-  }
-
-  const offsetX = (canvasWidth - drawWidth) / 2;
-  const offsetY = (canvasHeight - drawHeight) / 2;
-
+  ctx.drawImage(image, offsetX, offsetY, scaledWidth, scaledHeight);
   currentFrameIndex = index;
-  context.drawImage(image, offsetX, offsetY, drawWidth, drawHeight);
 };
+
 
 const isElementInViewport = (el: HTMLElement): number => {
   const rect = el.getBoundingClientRect();
@@ -122,14 +118,49 @@ const onScroll = () => {
 };
 
 const setCanvasSize = () => {
-  if (canvas.value) {
-    canvas.value.width = window.innerWidth;
-    canvas.value.height = window.innerHeight;
-      const i = currentFrameIndex
-      currentFrameIndex = -1;
-      drawFrame(i)
+  if (!canvas.value) return;
+
+  const dpr = window.devicePixelRatio || 1;
+
+  // Set internal resolution
+  canvas.value.width = BASE_WIDTH * dpr;
+  canvas.value.height = BASE_HEIGHT * dpr;
+
+  // Style size: scale to viewport while keeping aspect ratio
+  const screenWidth = window.innerWidth;
+  const screenHeight = window.innerHeight;
+  const screenRatio = screenWidth / screenHeight;
+
+  let displayWidth, displayHeight;
+
+  if (screenRatio > ASPECT_RATIO) {
+    // screen is wider → fit height
+    displayHeight = screenHeight;
+    displayWidth = screenHeight * ASPECT_RATIO;
+  } else {
+    // screen is taller → fit width
+    displayWidth = screenWidth;
+    displayHeight = screenWidth / ASPECT_RATIO;
   }
+
+  canvas.value.style.width = `${displayWidth}px`;
+  canvas.value.style.height = `${displayHeight}px`;
+
+      const i = currentFrameIndex
+    currentFrameIndex = -1;
+    drawFrame(i)
 };
+
+
+// const setCanvasSize = () => {
+//   if (canvas.value) {
+//     canvas.value.width = window.innerWidth;
+//     canvas.value.height = window.innerHeight;
+//     const i = currentFrameIndex
+//     currentFrameIndex = -1;
+//     drawFrame(i)
+//   }
+// };
 
 onMounted(() => {
   setCanvasSize();
@@ -168,14 +199,24 @@ onBeforeUnmount(() => {
 
 <style scoped>
 .canvas {
-  width: 100%;
   height: 100vh;
   display: block;
   position: sticky;
   top: 0;
+  left: 0;
+  background-color: red;
 }
 
-.canvas-container {}
+.canvas-container {
+  width: 100%;
+  display: flex;
+
+  justify-content: center;
+
+
+
+
+}
 
 
 .canvas--active {
